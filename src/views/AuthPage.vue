@@ -36,7 +36,7 @@ export default {
         await this.$router.push('/dashboard')
       } catch (e) {
         console.log(e)
-        this.$bvToast.toast('Пошёл нахуй', { autoHideDelay: 5000, variant: 'danger', noCloseButton: true })
+        this.$bvToast.toast('Пошёл нахуй', { autoHideDelay: 5 * 1000, variant: 'danger', noCloseButton: true })
       }
     }
   }

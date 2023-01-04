@@ -13,7 +13,7 @@
       h2(v-if="shop.first" v-text="shop.first")
       h3(v-if="shop.second" v-text="shop.second")
       h4(v-if="shop.third" v-text="shop.third")
-      h5(v-if="shop.third" v-text="shop.third")
+      h5(v-if="shop.fourth" v-text="shop.fourth")
       p(v-if="shop.total" v-text="shop.total")
 
       b-button.d-inline-flex.pt-2.pr-3.pl-2.pb-2(v-if="shop.total" variant="primary" @click="startParsing(shop.name)")
@@ -35,7 +35,8 @@ export default {
     data: null,
     proxies: null,
     proxiesTextarea: null,
-    isEditProxies: false
+    isEditProxies: false,
+    intervalId: null
   }),
   computed: {
     proxiesReq () {
@@ -48,22 +49,19 @@ export default {
       this.$router.push('/login')
     },
     async startParsing (shop) {
-      if (shop) console.log(shop)
+      if (shop) {
+        setTimeout(await this.getStatus, 1000)
+        const { data } = await this.$axios.post('/start_parser', { shop: 'stockmann' })
+        this.$bvToast.toast(data, { autoHideDelay: 5 * 1000, variant: 'success', noCloseButton: true })
+      } else {
+        setTimeout(await this.getStatus, 1000)
+        const { data } = await this.$axios.post('/start_parser', { all: true })
+        this.$bvToast.toast(data, { autoHideDelay: 5 * 1000, variant: 'success', noCloseButton: true })
+      }
     },
-    async parsingProductsStoresData () {
-      this.data = [
-        {
-          name: 'brandshop',
-          first: 'Начало сбора в 1:25:03',
-          second: 'Ссылки на товары собраны в 1:25:18 за 15 сек.',
-          third: 'Информация по товарам собрана в 1:28:42 за 3 мин. 34 сек.',
-          total: '3054 прод. было собрано за 5 мин. 32 сек.'
-        },
-        {
-          name: 'stockmann',
-          first: 'Начало сбора в 1:25:03'
-        }
-      ]
+    async getStatus () {
+      const { data } = await this.$axios.get('/status')
+      this.data = data
     },
     async getProxies () {
       try {
@@ -85,11 +83,15 @@ export default {
     }
   },
   async created () {
+    await this.getStatus()
     await this.getProxies()
     this.proxiesTextarea = this.proxies.reduce((acc, proxy) => acc += proxy + '\n', '')
   },
   async mounted () {
-    await this.parsingProductsStoresData()
+    this.intervalId = setInterval(await this.getStatus, 3 * 1000)
+  },
+  beforeDestroy () {
+    clearInterval(this.intervalId)
   }
 }
 </script>
