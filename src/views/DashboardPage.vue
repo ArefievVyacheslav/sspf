@@ -51,7 +51,7 @@ export default {
     async startParsing (shop) {
       if (shop) {
         setTimeout(await this.getStatus, 1000)
-        const { data } = await this.$axios.post('/start_parser', { shop: 'stockmann' })
+        const { data } = await this.$axios.post('/start_parser', { shop })
         this.$bvToast.toast(data, { autoHideDelay: 5 * 1000, variant: 'success', noCloseButton: true })
       } else {
         setTimeout(await this.getStatus, 1000)
