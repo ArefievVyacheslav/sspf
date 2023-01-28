@@ -88,7 +88,7 @@ export default {
     this.proxiesTextarea = this.proxies.reduce((acc, proxy) => acc += proxy + '\n', '')
   },
   async mounted () {
-    this.intervalId = setInterval(await this.getStatus, 3 * 1000)
+    this.intervalId = setInterval(await this.getStatus, 5 * 60 * 1000)
   },
   beforeDestroy () {
     clearInterval(this.intervalId)
